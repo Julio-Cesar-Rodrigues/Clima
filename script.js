@@ -1,0 +1,53 @@
+let weather = {
+  apiKey: '682a080307aad1bafdc2363c9394894e',
+  fetchWeather: function (city) {
+    fetch(
+      'https://api.openweathermap.org/data/2.5/weather?q=' +
+        city +
+        '&units=metric&appid=' +
+        this.apiKey
+    )
+      .then(response => {
+        if (!response.ok) {
+          alert('Não Encontrado.')
+          throw new Error('Não Encontrado.')
+        }
+        return response.json()
+      })
+      .then(data => this.displayWeather(data))
+  },
+  displayWeather: function (data) {
+    const { name } = data
+    const { icon, description } = data.weather[0]
+    const { temp, humidity } = data.main
+    const { speed } = data.wind
+    document.querySelector('.city').innerText = 'Clima em ' + name
+    document.querySelector('.icon').src =
+      'https://openweathermap.org/img/wn/' + icon + '.png'
+    document.querySelector('.description').innerText = description
+    document.querySelector('.temp').innerText = temp + '°C'
+    document.querySelector('.humidity').innerText =
+      'Umidade de: ' + humidity + '%'
+    document.querySelector('.wind').innerText = 'Vel.vento: ' + speed + ' km/h'
+    document.querySelector('.weather').classList.remove('loading')
+    document.body.style.backgroundImage =
+      "url('https://source.unsplash.com/1600x900/?" + name + "')"
+  },
+  search: function () {
+    this.fetchWeather(document.querySelector('.search-bar').value)
+  }
+}
+
+document.querySelector('.search button').addEventListener('click', function () {
+  weather.search()
+})
+
+document
+  .querySelector('.search-bar')
+  .addEventListener('keyup', function (event) {
+    if (event.key == 'Enter') {
+      weather.search()
+    }
+  })
+
+weather.fetchWeather('')
